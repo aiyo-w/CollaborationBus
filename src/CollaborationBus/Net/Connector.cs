@@ -15,7 +15,6 @@ namespace CollaborationBus
     public class Connector
     {
         private UdpClient _udpClient;
-        private NetworkStream _networkStream;
         private byte[] _dataBuffer;
         private IPEndPoint _multiCast;
 
@@ -31,7 +30,7 @@ namespace CollaborationBus
             _port = port;
             _multiCast = new IPEndPoint(IPAddress.Parse("239.0.0.1"), 9898);
 
-            _udpClient = new UdpClient(new IPEndPoint(IPAddress.Any,9898));
+            _udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, 9898));
             _udpClient.JoinMulticastGroup(_multiCast.Address);
 
             Thread thread = new Thread(ReciveMessage);
@@ -49,12 +48,12 @@ namespace CollaborationBus
         {
             while (true)
             {
-                IPEndPoint iep = new IPEndPoint(IPAddress.Any,0);
+                IPEndPoint iep = new IPEndPoint(IPAddress.Any, 0);
                 byte[] messageBuffer = _udpClient.Receive(ref iep);
 
                 string recevieMessage = Encoding.UTF8.GetString(messageBuffer);
 
-                RecevieMessage?.Invoke(this,recevieMessage);
+                RecevieMessage?.Invoke(this, recevieMessage);
             }
         }
 
