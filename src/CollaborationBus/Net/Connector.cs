@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CollaborationBus.Entity;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -39,9 +40,14 @@ namespace CollaborationBus
 
         public void SendMessage(string message)
         {
+            //TODO:使用GP协议打包消息
             byte[] messageBuffer = Encoding.UTF8.GetBytes(message);
-            _udpClient.Send(messageBuffer, messageBuffer.Length, _multiCast);
-            Debug.WriteLine("send {0}", message);
+
+            GP gp = new GP(messageBuffer);
+            byte[] buffer = gp.ToBytes();
+
+            _udpClient.Send(buffer, buffer.Length, _multiCast);
+            Debug.WriteLine("send {0}", buffer);
         }
 
         public void ReciveMessage()
@@ -51,9 +57,15 @@ namespace CollaborationBus
                 IPEndPoint iep = new IPEndPoint(IPAddress.Any, 0);
                 byte[] messageBuffer = _udpClient.Receive(ref iep);
 
-                string recevieMessage = Encoding.UTF8.GetString(messageBuffer);
+                //TODO:判断收到的是否为GP协议的包
+                GP gp;
+                bool isGp = GP.TryParse(messageBuffer, out gp);
 
-                RecevieMessage?.Invoke(this, recevieMessage);
+                //TODO:将消息从包中提取出来
+                if (isGp) {
+                    string recevieMessage = Encoding.UTF8.GetString(gp.data);
+                    RecevieMessage?.Invoke(this, recevieMessage);
+                }
             }
         }
 

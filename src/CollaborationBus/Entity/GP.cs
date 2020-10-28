@@ -10,6 +10,7 @@ namespace CollaborationBus.Entity
         private byte[] _version;
         private int _dataLen;
         private byte[] _data;
+        public byte[] data { get; set; }
 
         public GP(byte[] data)
         {
